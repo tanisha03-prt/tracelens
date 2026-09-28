@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+.venv/
+
+# Environment variables / secrets
+.env
+
+# macOS
+.DS_Store
+
+# Node
+node_modules/
+
+# Build files
+dist/
+build/
+
+# IDE
+.vscode/
