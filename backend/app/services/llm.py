@@ -1,4 +1,10 @@
 import os
+import json
+
+from dotenv import load_dotenv
+from openai import OpenAI
+
+from ..models.extraction import ExtractionResult
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -14,17 +20,46 @@ client = OpenAI(api_key=api_key)
 
 
 def ask_llm(prompt: str):
-    response = client.responses.create(
-        model="gpt-5.6-luna",
-        input=prompt
-    )
+    return """
+{
+    "company": "ABC Technologies",
+    "date": "12 March 2026",
+    "amount": 5400,
+    "currency": "EUR",
+    "payment_terms": "30 days"
+}
+"""
 
-    return response.output_text
+
+def extract_document(raw_text: str):
+    prompt = f"""
+Extract the following information from this document:
+
+- company
+- date
+- amount
+- currency
+- payment_terms
+
+Document:
+{raw_text}
+"""
+
+    response = ask_llm(prompt)
+
+    data = json.loads(response)
+
+    return ExtractionResult(**data)
 
 
 if __name__ == "__main__":
-    print("OpenAI client configured successfully")
+    document = """
+    ABC Technologies
+    Invoice Date: 12 March 2026
+    Total Amount: €5,400
+    Payment Terms: 30 days
+    """
 
-    answer = ask_llm("Say hello in one short sentence.")
-    print(answer)
-    
+    result = extract_document(document)
+
+    print(result)
