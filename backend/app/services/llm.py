@@ -5,9 +5,8 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from ..models.extraction import ExtractionResult
+from ..models.classification import ClassificationResult
 
-from dotenv import load_dotenv
-from openai import OpenAI
 
 load_dotenv()
 
@@ -20,6 +19,9 @@ client = OpenAI(api_key=api_key)
 
 
 def ask_llm(prompt: str):
+    if "Classify" in prompt:
+        return "invoice"
+
     return """
 {
     "company": "ABC Technologies",
@@ -52,6 +54,24 @@ Document:
     return ExtractionResult(**data)
 
 
+def classify_document(raw_text: str):
+    prompt = f"""
+Classify the following document into exactly one of these categories:
+
+- invoice
+- contract
+- report
+- correspondence
+
+Document:
+{raw_text}
+"""
+
+    response = ask_llm(prompt)
+
+    return ClassificationResult(document_type=response.strip())
+
+
 if __name__ == "__main__":
     document = """
     ABC Technologies
@@ -60,6 +80,11 @@ if __name__ == "__main__":
     Payment Terms: 30 days
     """
 
-    result = extract_document(document)
+    extraction = extract_document(document)
+    classification = classify_document(document)
 
-    print(result)
+    print("Extraction:")
+    print(extraction)
+
+    print("\nClassification:")
+    print(classification)
