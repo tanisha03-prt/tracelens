@@ -11,7 +11,8 @@ from .services.llm import (
 from .storage.trace_storage import save_trace
 import uuid
 import time
-
+from .storage.trace_storage import save_trace, get_trace
+from fastapi import FastAPI, HTTPException
 
 app = FastAPI(title="TraceLens API")
 
@@ -19,6 +20,20 @@ app = FastAPI(title="TraceLens API")
 @app.get("/")
 def home():
     return {"message": "TraceLens is running"}
+
+
+@app.get("/traces/{trace_id}")
+def retrieve_trace(trace_id: str):
+    trace = get_trace(trace_id)
+
+    if trace is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Trace {trace_id} not found"
+        )
+
+    return trace
+
 
 
 @app.post("/pipeline/intake")
@@ -66,7 +81,7 @@ def intake(document: DocumentInput):
         )
 
         trace.status = "failed"
-        save_trace(trace)
+        
 
         return {
             "message": "Extraction failed",

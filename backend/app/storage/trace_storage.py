@@ -24,3 +24,13 @@ def save_trace(trace: Trace):
         json.dump(trace_data, file, indent=4, ensure_ascii=False)
 
     return str(file_path)
+
+
+def get_trace(trace_id: str):
+    file_path = TRACES_DIR / f"{trace_id}.json"
+
+    if not file_path.exists():
+        return None
+
+    with file_path.open("r", encoding="utf-8") as file:
+        return json.load(file)
