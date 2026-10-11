@@ -8,7 +8,7 @@ from .services.llm import (
     classify_document,
     summarize_document
 )
-
+from .storage.trace_storage import save_trace
 import uuid
 import time
 
@@ -66,6 +66,7 @@ def intake(document: DocumentInput):
         )
 
         trace.status = "failed"
+        save_trace(trace)
 
         return {
             "message": "Extraction failed",
@@ -107,6 +108,7 @@ def intake(document: DocumentInput):
         )
 
         trace.status = "failed"
+        save_trace(trace)
 
         return {
             "message": "Classification failed",
@@ -151,6 +153,7 @@ def intake(document: DocumentInput):
         )
 
         trace.status = "failed"
+        save_trace(trace)
 
         return {
             "message": "Summarization failed",
@@ -161,6 +164,8 @@ def intake(document: DocumentInput):
 
     # All steps succeeded
     trace.status = "success"
+    save_trace(trace)
+
 
     return {
         "message": "Document processed",

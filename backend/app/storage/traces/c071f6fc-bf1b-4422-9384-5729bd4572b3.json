@@ -1,0 +1,40 @@
+{
+    "trace_id": "c071f6fc-bf1b-4422-9384-5729bd4572b3",
+    "status": "success",
+    "spans": [
+        {
+            "step_name": "extraction",
+            "input": "ABC Technologies\nInvoice Date: 12 March 2026\nTotal Amount: €5,400\nPayment Terms: 30 days",
+            "output": {
+                "company": "ABC Technologies",
+                "date": "12 March 2026",
+                "amount": 5400.0,
+                "currency": "EUR",
+                "payment_terms": "30 days"
+            },
+            "status": "success",
+            "latency_ms": 0.036207999983162154,
+            "error": null
+        },
+        {
+            "step_name": "classification",
+            "input": "ABC Technologies\nInvoice Date: 12 March 2026\nTotal Amount: €5,400\nPayment Terms: 30 days",
+            "output": {
+                "document_type": "invoice"
+            },
+            "status": "success",
+            "latency_ms": 0.007000000096013537,
+            "error": null
+        },
+        {
+            "step_name": "summarization",
+            "input": "ABC Technologies\nInvoice Date: 12 March 2026\nTotal Amount: €5,400\nPayment Terms: 30 days",
+            "output": {
+                "summary": "ABC Technologies issued an invoice dated 12 March 2026 for EUR 5,400 with payment terms of 30 days."
+            },
+            "status": "success",
+            "latency_ms": 0.00850000014906982,
+            "error": null
+        }
+    ]
+}

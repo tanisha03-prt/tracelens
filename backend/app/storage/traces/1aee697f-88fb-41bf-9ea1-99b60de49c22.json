@@ -1,0 +1,14 @@
+{
+    "trace_id": "1aee697f-88fb-41bf-9ea1-99b60de49c22",
+    "status": "failed",
+    "spans": [
+        {
+            "step_name": "extraction",
+            "input": "ABC Technologies invoice for EUR 5400",
+            "output": null,
+            "status": "failed",
+            "latency_ms": 0.005332999990059761,
+            "error": "Simulated extraction failure"
+        }
+    ]
+}
