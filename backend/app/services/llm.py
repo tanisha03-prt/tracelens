@@ -50,7 +50,6 @@ Extract the following information from this document:
 Document:
 {raw_text}
 """
-    raise Exception("Simulated extraction failure")
     
 
     response = ask_llm(prompt)
