@@ -43,3 +43,30 @@ def get_trace(trace_id: str):
 
     with file_path.open("r", encoding="utf-8") as file:
         return json.load(file)
+
+
+
+def analyze_failure(trace_id: str):
+    trace = get_trace(trace_id)
+
+    if trace is None:
+        return None
+
+    failed_spans = [
+        span for span in trace.get("spans", [])
+        if span.get("status") == "failed"
+    ]
+
+    return {
+        "trace_id": trace_id,
+        "trace_status": trace.get("status"),
+        "failure_count": len(failed_spans),
+        "failures": [
+            {
+                "step_name": span.get("step_name"),
+                "error": span.get("error"),
+                "latency_ms": span.get("latency_ms")
+            }
+            for span in failed_spans
+        ]
+    }

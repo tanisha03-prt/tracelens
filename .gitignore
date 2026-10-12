@@ -21,3 +21,6 @@ build/
 
 # IDE
 .vscode/
+
+app/storage/traces.db
+app/storage/traces/

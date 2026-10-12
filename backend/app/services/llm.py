@@ -38,6 +38,7 @@ def ask_llm(prompt: str):
 
 
 def extract_document(raw_text: str):
+    
     prompt = f"""
 Extract the following information from this document:
 

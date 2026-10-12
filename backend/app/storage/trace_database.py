@@ -40,3 +40,29 @@ def register_trace(trace_id: str, status: str, file_path: str):
 if __name__ == "__main__":
     initialize_database()
     print(f"Database initialized at: {DATABASE_PATH}")
+
+
+
+def list_traces(status: str | None = None):
+    with get_connection() as connection:
+        if status:
+            rows = connection.execute(
+                """
+                SELECT trace_id, status, created_at, file_path
+                FROM traces
+                WHERE status = ?
+                ORDER BY created_at DESC
+                """,
+                (status,)
+            ).fetchall()
+        else:
+            rows = connection.execute(
+                """
+                SELECT trace_id, status, created_at, file_path
+                FROM traces
+                ORDER BY created_at DESC
+                """
+            ).fetchall()
+
+        return [dict(row) for row in rows]
+

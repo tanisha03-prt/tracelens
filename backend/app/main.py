@@ -1,5 +1,9 @@
 
-from fastapi import FastAPI
+
+from fastapi import FastAPI, HTTPException
+
+import uuid
+import time
 
 from .models.document import DocumentInput
 from .models.trace import Trace, Span
@@ -8,11 +12,9 @@ from .services.llm import (
     classify_document,
     summarize_document
 )
-from .storage.trace_storage import save_trace
-import uuid
-import time
-from .storage.trace_storage import save_trace, get_trace
-from fastapi import FastAPI, HTTPException
+from .storage.trace_storage import save_trace, get_trace, analyze_failure
+from .storage.trace_database import list_traces
+
 
 app = FastAPI(title="TraceLens API")
 
@@ -31,8 +33,26 @@ def retrieve_trace(trace_id: str):
             status_code=404,
             detail=f"Trace {trace_id} not found"
         )
+    
 
     return trace
+
+@app.get("/traces")
+def get_all_traces(status: str | None = None):
+    return list_traces(status)
+
+
+@app.get("/traces/{trace_id}/analysis")
+def get_failure_analysis(trace_id: str):
+    analysis = analyze_failure(trace_id)
+
+    if analysis is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Trace {trace_id} not found"
+        )
+
+    return analysis
 
 
 
@@ -62,10 +82,12 @@ def intake(document: DocumentInput):
                 input=document.raw_text,
                 output=extraction.model_dump(),
                 status="success",
+                
                 latency_ms=latency
             )
         )
 
+    
     except Exception as e:
         latency = (time.perf_counter() - start_time) * 1000
 
@@ -81,7 +103,7 @@ def intake(document: DocumentInput):
         )
 
         trace.status = "failed"
-        
+        save_trace(trace)
 
         return {
             "message": "Extraction failed",
@@ -89,6 +111,7 @@ def intake(document: DocumentInput):
             "trace_id": trace.trace_id,
             "trace": trace
         }
+
 
     # Classification
     start_time = time.perf_counter()
