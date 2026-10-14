@@ -46,6 +46,7 @@ def get_trace(trace_id: str):
 
 
 
+
 def analyze_failure(trace_id: str):
     trace = get_trace(trace_id)
 
@@ -57,16 +58,42 @@ def analyze_failure(trace_id: str):
         if span.get("status") == "failed"
     ]
 
+    failures = []
+
+    for span in failed_spans:
+        error = span.get("error") or "Unknown error"
+
+        # Rule-based failure analysis
+        if "Simulated extraction failure" in error:
+            likely_cause = "Extraction was deliberately failed during testing"
+            recommended_action = (
+                "Remove the temporary test exception and retry the pipeline"
+            )
+
+        elif "JSON" in error or "json" in error:
+            likely_cause = "The extraction response may not be valid JSON"
+            recommended_action = (
+                "Check the extraction response format before parsing it"
+            )
+
+        else:
+            likely_cause = "The step failed; the exact cause is not yet classified"
+            recommended_action = (
+                "Inspect the error message and the failed step's input"
+            )
+
+        failures.append({
+            "step_name": span.get("step_name"),
+            "error": error,
+            "latency_ms": span.get("latency_ms"),
+            "likely_cause": likely_cause,
+            "recommended_action": recommended_action
+        })
+
     return {
         "trace_id": trace_id,
         "trace_status": trace.get("status"),
-        "failure_count": len(failed_spans),
-        "failures": [
-            {
-                "step_name": span.get("step_name"),
-                "error": span.get("error"),
-                "latency_ms": span.get("latency_ms")
-            }
-            for span in failed_spans
-        ]
+        "failure_count": len(failures),
+        "failures": failures
     }
+
