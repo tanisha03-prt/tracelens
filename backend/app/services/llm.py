@@ -9,14 +9,13 @@ from ..models.classification import ClassificationResult
 from ..models.summary import SummaryResult
 
 
+# Load .env from backend directory if running from outside or inside
+env_path = os.path.join(os.path.dirname(__file__), "..", "..", ".env")
+load_dotenv(dotenv_path=env_path)
 load_dotenv()
 
 api_key = os.getenv("OPENAI_API_KEY")
-
-if not api_key:
-    raise RuntimeError("OPENAI_API_KEY is not set")
-
-client = OpenAI(api_key=api_key)
+client = OpenAI(api_key=api_key) if api_key else None
 
 
 def ask_llm(prompt: str):
